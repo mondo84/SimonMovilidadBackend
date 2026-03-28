@@ -57,7 +57,7 @@ builder.Services.AddCors(op =>
 
 var app = builder.Build();
 
-// MIDDLEWARE
+// ====== MIDDLEWARE
 app.UseMiddleware<IotMiddleware>();
 
 // Configure the HTTP request pipeline.
