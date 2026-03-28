@@ -1,0 +1,20 @@
+﻿using Application.DTOs;
+using Application.Interfaces;
+using Application.Response;
+using Microsoft.AspNetCore.Mvc;
+
+namespace IotApp.Controllers
+{
+    [Route("api/sensor")]
+    [ApiController]
+    public class SensorController(ISensorService service) : ControllerBase
+    {
+        private readonly ISensorService _sensorService = service;
+
+        [HttpPost("data")]
+        public async Task<AppResponse<SensorDto>> CaptureSensorData(SensorDto request)
+        {
+            return await _sensorService.SaveData(request);
+        }
+    }
+}
