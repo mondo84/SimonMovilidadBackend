@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Domain.Entities;
 
 namespace Application.Interfaces
 {
     public interface IAlertHub
     {
-        Task SendLocationUpdate(string vehicleId, double lat, double lng, DateTime timestamp);
+        Task SendLocationUpdate(SensorData dto);
         Task SendLowFuelAlert(string vehicleId, double remainingHours);
     }
 }
