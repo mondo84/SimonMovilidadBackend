@@ -1,4 +1,5 @@
 ﻿using Application.Common.Base64;
+using Application.DTOs;
 using Application.Interfaces;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,7 +9,7 @@ namespace Application.Services
 {
     public class TokenService : ITokenService
     {
-        public string GenerateToken(string secret, string issuer, string audience, int expireMinutes)
+        public string GenerateToken(UserTokenDto dto, string secret, string issuer, string audience, int expireMinutes)
         {
             var header = new
             {
@@ -18,6 +19,9 @@ namespace Application.Services
 
             var payload = new
             {
+                sub = dto.UserName,
+                userId = dto.UserId,
+                role = dto.Role,
                 iss = issuer,
                 aud = audience,
                 exp = DateTimeOffset.UtcNow.AddMinutes(expireMinutes).ToUnixTimeSeconds(),

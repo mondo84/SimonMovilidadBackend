@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Domain.Entities;
 using IotApp.Hubs;
 using Microsoft.AspNetCore.SignalR;
 
@@ -8,15 +9,9 @@ namespace IotApp.RealTime
     {
         private readonly IHubContext<AlertsHub> _hub = hub;
 
-        public async Task SendLocationUpdate(string vehicleId, double lat, double lng, DateTime timestamp)
+        public async Task SendLocationUpdate(SensorData dto)
         {
-            await _hub.Clients.All.SendAsync("LOCATION_UPDATE", new
-            {
-                vehicleId,
-                lat,
-                lng,
-                timestamp
-            });
+            await _hub.Clients.All.SendAsync("LOCATION_UPDATE", dto);
         }
 
         public async Task SendLowFuelAlert(string vehicleId, double remainingHours)

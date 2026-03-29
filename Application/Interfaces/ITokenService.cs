@@ -1,7 +1,9 @@
-﻿namespace Application.Interfaces
+﻿using Application.DTOs;
+
+namespace Application.Interfaces
 {
     public interface ITokenService
     {
-        string GenerateToken(string secret, string issuer, string audience, int expireMinutes);
+        string GenerateToken(UserTokenDto dto, string secret, string issuer, string audience, int expireMinutes);
     }
 }

@@ -1,11 +1,14 @@
 ﻿using Application.Common.Base64;
 using Application.Common.Exceptions;
 using Application.Response;
-using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace IotApp.Middleware
 {
@@ -17,8 +20,29 @@ namespace IotApp.Middleware
         {
             try
             {
+                if (ctx.Request.Method == "OPTIONS")
+                {
+                    await _next(ctx);
+                    return;
+                }
+
+                var endpoint = ctx.GetEndpoint();
+                var allowAnonymous = endpoint?.Metadata?.GetMetadata<IAllowAnonymous>() != null;
+
+                if (allowAnonymous)
+                {
+                    await _next(ctx);
+                    return;
+                }
+
                 var path = ctx.Request.Path.Value?.ToLower();
-                
+
+                // Permitir SignalR sin validar token
+                if (path!.StartsWith("/ws"))
+                {
+                    await _next(ctx);
+                    return;
+                }
 
                 if (path!.StartsWith("/swagger") || path.StartsWith("/api/auth"))
                 {
@@ -37,9 +61,24 @@ namespace IotApp.Middleware
 
                 var token = authHeader.Substring("Bearer ".Length).Trim();
 
-                var isValid = ValidToken(token);
-                if (!isValid)
+                var payload = ValidTokenAndDeserialize(token);
+                if (payload == null)
                     throw new AppException(HttpStatusCode.Unauthorized, "Token invalido");
+
+                // Split a los roles.
+                var rolesToken = payload.Role.Split(",", StringSplitOptions.RemoveEmptyEntries);
+
+                var claims = new List<Claim>
+                {
+                    new (ClaimTypes.Name, payload.Sub),
+                };
+
+                foreach (var role in rolesToken)
+                {
+                    claims.Add(new (ClaimTypes.Role, role.Trim())); // cada rol como claim
+                }
+
+                ctx.User = new ClaimsPrincipal(new ClaimsIdentity(claims, "ManualJwt"));
 
                 await _next(ctx);
                 return;
@@ -63,10 +102,10 @@ namespace IotApp.Middleware
             }
         }
 
-        private static bool ValidToken(string token)
+        private static ValidTokenResponse? ValidTokenAndDeserialize(string token)
         {
             var parts = token.Split('.');
-            if (parts.Length != 3) return false;
+            if (parts.Length != 3) return null;
 
             var header = parts[0];
             var payload = parts[1];
@@ -80,7 +119,7 @@ namespace IotApp.Middleware
 
             var signatureFromUnsignedToken = Base64Utility.Base64UrlEncode(hash);
 
-            if (SignatureFromSubstring != signatureFromUnsignedToken) return false;
+            if (SignatureFromSubstring != signatureFromUnsignedToken) return null;
 
             var payloadJson = Encoding.UTF8.GetString(Base64Utility.Base64UrlDecode(payload));
 
@@ -89,10 +128,29 @@ namespace IotApp.Middleware
                 var expValue = Base64Utility.ExtractExp(payloadJson);
                 var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-                if (now > expValue) return false;
+                if (now > expValue) return null;
             }
 
-            return true;
+            var jwtPayload = JsonSerializer.Deserialize<ValidTokenResponse>(payloadJson);
+
+            return jwtPayload;
         }
+
+
+    }
+
+    public class ValidTokenResponse
+    {
+        [JsonPropertyName("sub")]
+        public string Sub { get; set; } = string.Empty;
+
+        [JsonPropertyName("userId")]
+        public int UserId { get; set; }
+
+        [JsonPropertyName("role")]
+        public string Role { get; set; } = string.Empty;
+
+        [JsonPropertyName("exp")]
+        public long Exp { get; set; }
     }
 }

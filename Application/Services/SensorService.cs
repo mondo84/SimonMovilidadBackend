@@ -39,7 +39,7 @@ namespace Application.Services
             }
 
             // Enviar localizacion tiempo real. SignalR.
-            await _notifier.SendLocationUpdate(dto.VehicleId, dto.Lat, dto.Long, dto.Timestamp);
+            await _notifier.SendLocationUpdate(sensorData);
 
             return AppResponse<SensorDto>.Ok(dto, "Datos guardados exitosamente");
         }

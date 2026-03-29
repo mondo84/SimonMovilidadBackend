@@ -15,21 +15,27 @@ namespace Domain.Entities
         public string VehicleId { get; set; } = string.Empty;
 
         [Required]
+        [JsonPropertyName("Lat")]
         public double Lat { get; set; }
 
         [Required]
+        [JsonPropertyName("Long")]
         public double Long { get; set; }
 
         [Required]
+        [JsonPropertyName("FuelLevel")]
         public double FuelLevel { get; set; }
 
         [Required]
+        [JsonPropertyName("Temperature")]
         public double Temperature { get; set; }
 
         [Required]
+        [JsonPropertyName("Timestamp")]
         public DateTime Timestamp { get; set; }
 
         [Required]
+        [JsonPropertyName("Active")]
         public bool Active { get; set; } = true;
     }
 }

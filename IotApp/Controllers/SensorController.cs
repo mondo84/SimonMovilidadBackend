@@ -1,6 +1,7 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
 using Application.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IotApp.Controllers
@@ -11,6 +12,7 @@ namespace IotApp.Controllers
     {
         private readonly ISensorService _sensorService = service;
 
+        [Authorize(Roles = "Admin, User, Viewer")]
         [HttpPost("data")]
         public async Task<AppResponse<SensorDto>> CaptureSensorData(SensorDto request)
         {

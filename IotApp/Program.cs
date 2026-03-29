@@ -3,9 +3,11 @@ using Application.Services;
 using Domain.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
+using IotApp.DummyHandler;
 using IotApp.Hubs;
 using IotApp.Middleware;
 using IotApp.RealTime;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -43,22 +45,31 @@ builder.Services.AddScoped<ISensorService, SensorService>();
 builder.Services.AddScoped<IAlertHub, SignalrNotifier>();
 
 // ====== CORS
-const string CorsName = "My_App_Cors";
+string corsConfig = "My_Cors";
+string[] withorigins = ["http://localhost:3000", "http://localhost:3030"];
+
 builder.Services.AddCors(op =>
 {
-    op.AddPolicy(CorsName, policy =>
+    op.AddPolicy(corsConfig, policy =>
     {
         policy
-        .AllowAnyOrigin()
+        .WithOrigins(withorigins)
+        .AllowAnyMethod()
         .AllowAnyHeader()
-        .AllowAnyMethod();
+        .AllowCredentials()
+        .SetPreflightMaxAge(TimeSpan.FromMinutes(10));
     });
 });
 
+// Registrar este esquema por defecto que ya tiene un User asignado para que .net
+// tenga con que validar el Rol y no arroje el error de esquema por defecto cuando el rol cambia.
+builder.Services.AddAuthentication("ManualJwt")
+    .AddScheme<AuthenticationSchemeOptions, DummyHandler>("ManualJwt", options => { });
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
-// ====== MIDDLEWARE
-app.UseMiddleware<IotMiddleware>();
+builder.Logging.AddConsole();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -68,8 +79,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors(CorsName);
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseCors(corsConfig);
 app.UseHttpsRedirection();
+
+// ====== MIDDLEWARE
+app.UseMiddleware<IotMiddleware>();
+
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapHub<AlertsHub>("/ws/alerts");

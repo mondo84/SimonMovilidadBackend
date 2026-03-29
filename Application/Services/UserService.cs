@@ -30,7 +30,7 @@ namespace Application.Services
             var issuer = "yesid_davila_editor_de_prueba_token_manual";
             var audience = "audience_simon_movilidad";
             var expireMin = 120;
-            var token = _tokenService.GenerateToken(secretKey, issuer, audience, expireMin); // _jwtService.GenerateToken(objUserDto);
+            var token = _tokenService.GenerateToken(objUserDto, secretKey, issuer, audience, expireMin); // _jwtService.GenerateToken(objUserDto);
 
             return AppResponse<UserTokenDto>.Ok(objUserDto, "Operacion exitosa", token);
         }
@@ -181,14 +181,14 @@ namespace Application.Services
                         Errors = errors
                     });
 
-                var isValid = true; // BCrypt.Net.BCrypt.Verify(dto.PasswordHash, user.PasswordHash);
+                var isValid = BCrypt.Net.BCrypt.Verify(dto.PasswordHash, user.PasswordHash);
                 if (!isValid)
                     throw new AppException(HttpStatusCode.BadRequest, new ErrorList { 
                         Message = "Error de validacion",
                         Errors = ["Contraseña actual incorrecta" ]
                     });
 
-                user.PasswordHash = "23deeff"; // BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
             }
         }
     }
