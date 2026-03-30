@@ -31,6 +31,10 @@ namespace Domain.Entities
         public double Temperature { get; set; }
 
         [Required]
+        [JsonPropertyName("Speed")]
+        public float Speed { get; set; }
+
+        [Required]
         [JsonPropertyName("Timestamp")]
         public DateTime Timestamp { get; set; }
 

@@ -15,6 +15,18 @@ namespace Infrastructure.Repositories
             await _context.SensorData.AddAsync(entity);
         }
 
+        public async Task<List<SensorData>> GetAllAsync(bool showInactive)
+        {
+            var query = _context.SensorData
+                    .Where(w => w.VehicleId != null)
+                    .AsNoTracking();
+
+            if (!showInactive)
+                query = query.Where(u => u.Active);
+
+            return await query.ToListAsync();
+        }
+
         public async Task<List<SensorData>> GetSensorDataListAsync(string vehicleId)
         {
             var resp = await _context.SensorData.Where(x => x.VehicleId == vehicleId)
@@ -23,6 +35,17 @@ namespace Infrastructure.Repositories
                 .ToListAsync();
   
             return resp;
+        }
+
+        public async Task<List<SensorData>> TodaysSensorDataHistory(int takeNumber)
+        {
+            // Creacion mayor a la media noche de hoy, y menor a la de mañana.
+            return await _context.SensorData
+                .Where(w => w.Active)
+                .OrderByDescending(w => w.Timestamp)
+                .Take(takeNumber)
+                .OrderBy(w => w.Timestamp)  // reordenar para gráfico cronológico
+                .ToListAsync();
         }
     }
 }

@@ -9,9 +9,9 @@ namespace IotApp.RealTime
     {
         private readonly IHubContext<AlertsHub> _hub = hub;
 
-        public async Task SendLocationUpdate(SensorData dto)
+        public async Task SendLocationUpdate(List<SensorData> historyList)
         {
-            await _hub.Clients.All.SendAsync("LOCATION_UPDATE", dto);
+            await _hub.Clients.All.SendAsync("LOCATION_UPDATE", historyList);
         }
 
         public async Task SendLowFuelAlert(string vehicleId, double remainingHours)

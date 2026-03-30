@@ -14,16 +14,24 @@ namespace Application.Services
         private readonly IAlertService _alertService = alertService;
         private readonly IAlertHub _notifier = notifier;
 
-        public async Task<AppResponse<SensorDto>> SaveData(SensorDto dto)
+        public async Task<AppResponse<List<SensorData>>> GetSensorDataListAsync(bool showInactive)
+        {
+            var resp = await _unitOfWork.Sensors.GetAllAsync(showInactive);
+
+            return AppResponse<List<SensorData>>.Ok(resp, "Historial sensor");
+        }
+
+        public async Task<AppResponse<List<SensorData>>> SaveData(SensorDto dto)
         {
             var sensorData = new SensorData()
             {
                 Lat = dto.Lat,
                 Long = dto.Long,
                 FuelLevel = dto.FuelLvl,
+                Speed = dto.Speed,
                 Temperature = dto.Temp,
                 VehicleId = dto.VehicleId,
-                Timestamp = dto.Timestamp,
+                Timestamp = dto.Timestamp.ToUniversalTime(),
             };
 
             await _unitOfWork.Sensors.AddAsync(sensorData);
@@ -37,11 +45,11 @@ namespace Application.Services
                 // Alerta combustible bajo. SignalR.
                 await _notifier.SendLowFuelAlert(dto.VehicleId, remainingHours);
             }
+            var NumberOfRecentRecords = 50;
+            var sensorHistory = await _unitOfWork.Sensors.TodaysSensorDataHistory(NumberOfRecentRecords);
+            await _notifier.SendLocationUpdate(sensorHistory); // Enviar localizacion tiempo real. SignalR.
 
-            // Enviar localizacion tiempo real. SignalR.
-            await _notifier.SendLocationUpdate(sensorData);
-
-            return AppResponse<SensorDto>.Ok(dto, "Datos guardados exitosamente");
+            return AppResponse<List<SensorData>>.Ok(sensorHistory, "Datos guardados exitosamente");
         }
     }
 }
