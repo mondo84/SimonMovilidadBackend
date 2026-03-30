@@ -4,7 +4,6 @@ using Application.Interfaces;
 using Application.Response;
 using Domain.Entities;
 using Domain.Interfaces;
-using System.Net;
 
 namespace Application.Services
 {
@@ -14,11 +13,25 @@ namespace Application.Services
         private readonly IAlertService _alertService = alertService;
         private readonly IAlertHub _notifier = notifier;
 
-        public async Task<AppResponse<List<SensorData>>> GetSensorDataListAsync(bool showInactive)
+        public async Task<AppResponse<List<SensorDataDto>>> GetSensorDataListAsync(bool showInactive, string? role)
         {
             var resp = await _unitOfWork.Sensors.GetAllAsync(showInactive);
 
-            return AppResponse<List<SensorData>>.Ok(resp, "Historial sensor");
+            var hasRole = string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase);
+
+            var result = resp.Select(x => new SensorDataDto
+            {
+                VehicleId = hasRole ? x.VehicleId : MaskVehicleId(x.VehicleId),
+                Lat = x.Lat,
+                Long = x.Long,
+                FuelLevel = x.FuelLevel,
+                Temperature = x.Temperature,
+                Speed = x.Speed,
+                Timestamp = x.Timestamp,
+                Active = x.Active,
+            }).ToList();
+
+            return AppResponse<List<SensorDataDto>>.Ok(result, "Historial sensor");
         }
 
         public async Task<AppResponse<List<SensorData>>> SaveData(SensorDto dto)
@@ -50,6 +63,14 @@ namespace Application.Services
             await _notifier.SendLocationUpdate(sensorHistory); // Enviar localizacion tiempo real. SignalR.
 
             return AppResponse<List<SensorData>>.Ok(sensorHistory, "Datos guardados exitosamente");
+        }
+
+        public static string MaskVehicleId(string? vehicleId)
+        {
+            var textMask = "DEV-****";
+            if (string.IsNullOrWhiteSpace(vehicleId)) return textMask;
+
+            return textMask;
         }
     }
 }

@@ -8,6 +8,6 @@ namespace Application.Interfaces
     {
         Task<AppResponse<List<SensorData>>> SaveData(SensorDto dto);
 
-        Task<AppResponse<List<SensorData>>> GetSensorDataListAsync(bool showInactive);
+        Task<AppResponse<List<SensorDataDto>>> GetSensorDataListAsync(bool showInactive, string? role);
     }
 }

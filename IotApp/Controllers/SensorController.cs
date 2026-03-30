@@ -22,9 +22,11 @@ namespace IotApp.Controllers
 
         [Authorize(Roles = "Admin, User")]
         [HttpGet()]
-        public Task<AppResponse<List<SensorData>>> GetSensorDataList([FromQuery] bool showInactive = false)
+        public Task<AppResponse<List<SensorDataDto>>> GetSensorDataList([FromQuery] bool showInactive = false)
         {
-            return _sensorService.GetSensorDataListAsync(showInactive);
+            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+            return _sensorService.GetSensorDataListAsync(showInactive, role);
         }
     }
 }

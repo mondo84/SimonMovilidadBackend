@@ -34,5 +34,9 @@ namespace Application.DTOs
         [Required]
         [JsonPropertyName("timestamp")]
         public DateTime Timestamp { get; set; }
+
+        [Required]
+        [JsonPropertyName("active")]
+        public bool Active { get; set; } = true;
     }
 }
