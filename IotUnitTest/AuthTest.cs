@@ -13,48 +13,37 @@ namespace IotUnitTest
         [Fact]
         public async Task Auth_debe_devolver_usuario_y_token()
         {
-            // Arrange
             var mockUow = new Mock<IUnitOfWork>();
             var mockTokenService = new Mock<ITokenService>();
 
             var testUser = new Users
             {
-                UserId = 1,
+                UserId = 3,
                 UserName = "mondo84",
+                PasswordHash = "$2a$12$wq.NIoSIfOaVPqoBGHLUze0/KwLRiPuJPq9IojZxfjWr8aacQZZhe",
                 Role = new Role { RoleId = 1, Description = "Admin" }
             };
 
-            // Simulamos que el repositorio devuelve el usuario
             mockUow.Setup(x => x.Users.GetByUsernameAsync("mondo84"))
-                   .ReturnsAsync(testUser);
+           .ReturnsAsync(testUser);
 
-            // Simulamos que el tokenService genera un token
             mockTokenService.Setup(x => x.GenerateToken(
-                It.IsAny<UserTokenDto>(),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<int>()))
-                .Returns("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtb25kbzg0IiwidXNlcklkIjozLCJyb2xlIjoiQWRtaW4iLCJpc3MiOiJ5ZXNpZF9kYXZpbGFfZWRpdG9yX2RlX3BydWViYV90b2tlbl9tYW51YWwiLCJhdWQiOiJhdWRpZW5jZV9zaW1vbl9tb3ZpbGlkYWQiLCJleHAiOjE3NzQ4OTAxMTAsImlhdCI6MTc3NDg4MjkxMH0.eIcDsaqdTPie4sZ2HJKFS7Bv3VhLI4wiVwVfg8UxAGY");
+                It.IsAny<UserTokenDto>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()))
+                .Returns("TOKEN_SIMULADO");
 
             var authService = new UserService(mockUow.Object, mockTokenService.Object);
 
-            var dto = new AuthDto
-            {
-                Username = "admin",
-                Password = "cualquierpass"
-            };
+            var dto = new AuthDto { Username = "mondo84", Password = "123456" };
 
-            // Act
+            // Servicio testeado
             var response = await authService.Auth(dto);
-            
-            // Assert
+
             Assert.True(response.Success);
             Assert.NotNull(response.Data);
-            Assert.Equal(1, response.Data.UserId);
+            Assert.Equal(3, response.Data.UserId);
             Assert.Equal("mondo84", response.Data.UserName);
             Assert.Equal("Admin", response.Data.Role);
-            Assert.Equal("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJtb25kbzg0IiwidXNlcklkIjozLCJyb2xlIjoiQWRtaW4iLCJpc3MiOiJ5ZXNpZF9kYXZpbGFfZWRpdG9yX2RlX3BydWViYV90b2tlbl9tYW51YWwiLCJhdWQiOiJhdWRpZW5jZV9zaW1vbl9tb3ZpbGlkYWQiLCJleHAiOjE3NzQ4OTAxMTAsImlhdCI6MTc3NDg4MjkxMH0.eIcDsaqdTPie4sZ2HJKFS7Bv3VhLI4wiVwVfg8UxAGY", response.Token);
+            Assert.Equal("TOKEN_SIMULADO", response.Token);
         }
     }
 }

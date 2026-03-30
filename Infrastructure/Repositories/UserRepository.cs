@@ -42,11 +42,11 @@ namespace Infrastructure.Repositories
             _context.Users.Update(user);
         }
 
-        public async Task<Users?> GetByUsernameAsync(string email)
+        public async Task<Users?> GetByUsernameAsync(string username)
         {
             var resp = await _context.Users
                 .Include(join => join.Role).AsNoTracking()
-                .FirstOrDefaultAsync(user => user.UserName == email);
+                .FirstOrDefaultAsync(user => user.UserName == username);
             return resp;
         }
 

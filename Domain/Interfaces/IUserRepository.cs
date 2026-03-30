@@ -6,7 +6,7 @@ namespace Domain.Interfaces
     {
         Task<List<Users>> GetAllAsync(bool showInactive);
         Task<Users?> GetByIdAsync(int id);
-        Task<Users?> GetByUsernameAsync(string email);
+        Task<Users?> GetByUsernameAsync(string username);
         Task AddAsync(Users user);
         Task<bool> ValidateUsernme(string username);
         void Update(Users user);

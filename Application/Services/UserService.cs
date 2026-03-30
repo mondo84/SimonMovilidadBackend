@@ -108,7 +108,7 @@ namespace Application.Services
         private static Users VaryfyUser (AuthDto dto, Users? user)
         {
             if(user == null)
-               throw new AppException(HttpStatusCode.Conflict, "El correo usuario no se encuentra registrado");
+               throw new AppException(HttpStatusCode.Conflict, "El usuario no se encuentra registrado");
 
             if (!user.Active)
                 throw new AppException(HttpStatusCode.Conflict, "Usuario inactivo");

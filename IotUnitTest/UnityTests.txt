@@ -9,3 +9,8 @@
 		
 	3 - Retorna infinito si no hay datos (Success):
 		dotnet test .\IotUnitTest\IotUnitTest.csproj --filter FullyQualifiedName~IotUnitTest.AlertServiceTest.Retorna_infinito_si_no_hay_datos
+
+	4 - Devuelve usuario y token ():
+		 dotnet test .\IotUnitTest\IotUnitTest.csproj --filter FullyQualifiedName~IotUnitTest.AuthTest.Auth_debe_devolver_usuario_y_token
+
+		
