@@ -11,6 +11,6 @@ namespace Application.Interfaces
         Task<AppResponse<List<Users>>> GetUserListAsync(bool showInactive);
         Task<AppResponse<Users>> UpdateUserAsync(UserDto dto);
         Task<AppResponse> DeleteUserAsync(int id);
-        Task<AppResponse> Auth(AuthDto dto);
+        Task<AppResponse<UserTokenDto>> Auth(AuthDto dto);
     }
 }

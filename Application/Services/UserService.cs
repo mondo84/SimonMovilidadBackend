@@ -13,7 +13,7 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly ITokenService _tokenService = tokenService;
         
-        public async Task<AppResponse> Auth(AuthDto dto)
+        public async Task<AppResponse<UserTokenDto>> Auth(AuthDto dto)
         {
             var user = await _unitOfWork.Users.GetByUsernameAsync(dto.Username);
 

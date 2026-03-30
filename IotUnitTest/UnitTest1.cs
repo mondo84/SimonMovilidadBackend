@@ -27,11 +27,11 @@ namespace IotUnitTest
         }
 
         [Fact]
-        public async Task retorna_infinito_si_no_hay_datos()
+        public async Task Retorna_infinito_si_no_hay_datos()
         {
-            var dto = new SensorDto { VehicleId = "1" };
+            var dto = new SensorDto { VehicleId = "DEV-1234567-XY" };
 
-            _repo.Setup(x => x.GetSensorDataListAsync("1"))
+            _repo.Setup(x => x.GetSensorDataListAsync("DEV-1234567-XY"))
                 .ReturnsAsync(new List<SensorData>());
 
             var result = await _service.FuelPrediction(dto);
@@ -39,17 +39,18 @@ namespace IotUnitTest
             Assert.Equal(double.PositiveInfinity, result);
         }
 
+
         [Fact]
-        public async Task calcula_prediccion_correcta()
+        public async Task Calcula_prediccion_correcta()
         {
             var now = DateTime.UtcNow;
 
-            var dto = new SensorDto { VehicleId = "1" };
+            var dto = new SensorDto { VehicleId = "DEV-1234567-XY" };
 
             var data = new List<SensorData>
             {
-                new SensorData { FuelLevel = 40, Timestamp = now },
-                new SensorData { FuelLevel = 50, Timestamp = now.AddHours(-1) }
+                new () { FuelLevel = 40, Timestamp = now },
+                new () { FuelLevel = 50, Timestamp = now.AddHours(-1) }
             };
 
             _repo.Setup(x => x.GetSensorDataListAsync("1"))
@@ -57,7 +58,7 @@ namespace IotUnitTest
 
             var result = await _service.FuelPrediction(dto);
 
-            Assert.Equal(4, result, 1); // 40 / 10 = 4 horas
+            Assert.Equal(4, result, 1); // (combustible actual = 40) / (promedio combustible * hora = 10) = 4 horas.
         }
     }
 }

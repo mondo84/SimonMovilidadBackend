@@ -15,7 +15,7 @@ namespace AppPortal.Controllers
 
         [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<AppResponse> Auth(AuthDto authDto)
+        public async Task<AppResponse<UserTokenDto>> Auth(AuthDto authDto)
         {
             return await _service.Auth(authDto);
         }

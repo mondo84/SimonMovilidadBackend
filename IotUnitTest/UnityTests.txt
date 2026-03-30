@@ -1,0 +1,11 @@
+﻿  
+ Comando para ejecutar pruebas: 
+ 
+	1 - Mascara de IDs de dispositivos (Success):
+		dotnet test .\IotUnitTest\IotUnitTest.csproj --filter FullyQualifiedName~IotUnitTest.MaskTest.mascara_correcta
+
+	2 - Calculo de combustible (Success):
+		 dotnet test .\IotUnitTest\IotUnitTest.csproj --filter FullyQualifiedName~IotUnitTest.AlertServiceTest.Calcula_prediccion_correcta
+		
+	3 - Retorna infinito si no hay datos (Success):
+		dotnet test .\IotUnitTest\IotUnitTest.csproj --filter FullyQualifiedName~IotUnitTest.AlertServiceTest.Retorna_infinito_si_no_hay_datos
