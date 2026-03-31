@@ -15,9 +15,9 @@ namespace IotApp.Controllers
 
         [Authorize(Roles = "Admin, User, Viewer")]
         [HttpPost("data")]
-        public async Task<AppResponse<List<SensorData>>> CaptureSensorData(SensorDto request)
+        public async Task<AppResponse<List<SensorData>>> CaptureSensorData(List<SensorDto> dtoList)
         {
-            return await _sensorService.SaveData(request);
+            return await _sensorService.SaveData(dtoList);
         }
 
         [Authorize(Roles = "Admin, User, Viewer")]

@@ -6,7 +6,7 @@ namespace Application.Interfaces
 {
     public interface ISensorService
     {
-        Task<AppResponse<List<SensorData>>> SaveData(SensorDto dto);
+        Task<AppResponse<List<SensorData>>> SaveData(List<SensorDto> listDto);
 
         Task<AppResponse<List<SensorDataDto>>> GetSensorDataListAsync(bool showInactive, string? role);
 

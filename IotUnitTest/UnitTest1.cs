@@ -1,11 +1,4 @@
-﻿//namespace IotUnitTest
-//{
-//    public class UnitTest1
-//    {
-
-//    }
-//}
-using Xunit;
+﻿using Xunit;
 using Moq;
 using Application.Services;
 using Application.DTOs;

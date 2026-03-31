@@ -1,8 +1,10 @@
-﻿using Application.DTOs;
+﻿using Application.Common.Exceptions;
+using Application.DTOs;
 using Application.Interfaces;
 using Application.Response;
 using Domain.Entities;
 using Domain.Interfaces;
+using System.Net;
 
 namespace Application.Services
 {
@@ -33,26 +35,20 @@ namespace Application.Services
             return AppResponse<List<SensorDataDto>>.Ok(result, "Historial sensor");
         }
 
-        public async Task<AppResponse<List<SensorData>>> SaveData(SensorDto dto)
+        public async Task<AppResponse<List<SensorData>>> SaveData(List<SensorDto> listDto)
         {
-            var sensorData = new SensorData()
-            {
-                Lat = dto.Lat,
-                Long = dto.Long,
-                FuelLevel = dto.FuelLvl,
-                Speed = dto.Speed,
-                Temperature = dto.Temp,
-                VehicleId = dto.VehicleId,
-                Timestamp = dto.Timestamp.ToUniversalTime(),
-            };
+            if (listDto == null || listDto.Count == 0)
+                throw new AppException(HttpStatusCode.BadRequest, "Sensor data es requerido");
 
-            await _unitOfWork.Sensors.AddAsync(sensorData);
-            await _unitOfWork.SaveChangesAsync();
+            await SaveDataBatch(listDto);
+
+            var dto = listDto.FirstOrDefault()!;
 
             // Calcular autonomía
             var remainingHours = await _alertService.FuelPrediction(dto);
-            
-            if (remainingHours < 1)
+
+            // Si menos de 1 hora de autonomia, manda la alerta. Si han pasado mas de 20 minutos desde la ultima ubicacion.
+            if (remainingHours < 1) 
             {
                 var lastAlert = await _unitOfWork.Alerts
                     .GetLastAlertByVehicle(dto.VehicleId);
@@ -128,6 +124,30 @@ namespace Application.Services
                 .ToList();
 
             return AppResponse<List<AlarmDto>>.Ok(responseDto, "Listado de alarmas");
+        }
+
+        private async Task SaveDataBatch(List<SensorDto> listDto)
+        {
+            if (listDto == null || listDto.Count == 0)
+                return;
+
+            foreach (var dto in listDto)
+            {
+                var sensorData = new SensorData()
+                {
+                    Lat = dto.Lat,
+                    Long = dto.Long,
+                    FuelLevel = dto.FuelLvl,
+                    Speed = dto.Speed,
+                    Temperature = dto.Temp,
+                    VehicleId = dto.VehicleId,
+                    Timestamp = dto.Timestamp.ToUniversalTime(),
+                };
+
+                await _unitOfWork.Sensors.AddAsync(sensorData);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }
