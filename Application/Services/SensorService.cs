@@ -1,5 +1,4 @@
-﻿using Application.Common.Exceptions;
-using Application.DTOs;
+﻿using Application.DTOs;
 using Application.Interfaces;
 using Application.Response;
 using Domain.Entities;
@@ -71,6 +70,42 @@ namespace Application.Services
             if (string.IsNullOrWhiteSpace(vehicleId)) return textMask;
 
             return textMask;
+        }
+
+        public async Task<AppResponse<AlarmDto>> CreateAlarmAsync(AlarmDto dto)
+        {
+            var Alarm = new Alerts()
+            {
+                VehicleId=dto.VehicleId,
+                Message = dto.Message,
+                Active = dto.Active,
+                CreatedAt = DateTime.Now,
+            }; 
+
+            await _unitOfWork.Alerts.AddAsync(Alarm);
+            await _unitOfWork.SaveChangesAsync();
+
+            return AppResponse<AlarmDto>.Ok(dto, "Alarma creada exitosamente");
+        }
+
+        public async Task<AppResponse<List<AlarmDto>>> GetAlertListAsync(AlarmReqDto dto)
+        {
+            var vehicleId = dto.VehicleId;
+            var date = dto.Date;
+            var showInactive = dto.ShowInactive;
+
+            var respEntity = await _unitOfWork.Alerts.GetAlertListAsync(vehicleId, date, showInactive);
+            var responseDto = respEntity
+                .Select(s => new AlarmDto
+                {
+                    VehicleId = s.VehicleId,
+                    Message = s.Message,
+                    Active = s.Active,
+                    CreatedAt = s.CreatedAt
+                })
+                .ToList();
+
+            return AppResponse<List<AlarmDto>>.Ok(responseDto, "Listado de alarmas");
         }
     }
 }

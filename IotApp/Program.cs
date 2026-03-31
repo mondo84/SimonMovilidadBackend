@@ -38,6 +38,7 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ISensorRepository, SensorRepository>();
+builder.Services.AddScoped<IAlertRepository, AlertRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAlertService, AlertService>();

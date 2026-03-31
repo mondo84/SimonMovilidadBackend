@@ -20,13 +20,27 @@ namespace IotApp.Controllers
             return await _sensorService.SaveData(request);
         }
 
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(Roles = "Admin, User, Viewer")]
         [HttpGet()]
         public Task<AppResponse<List<SensorDataDto>>> GetSensorDataList([FromQuery] bool showInactive = false)
         {
             var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
 
             return _sensorService.GetSensorDataListAsync(showInactive, role);
+        }
+
+        [Authorize(Roles = "Admin, User, Viewer")]
+        [HttpPost("create/alert")]
+        public async Task<AppResponse<AlarmDto>> Create(AlarmDto dto)
+        {
+            return await _sensorService.CreateAlarmAsync(dto);
+        }
+
+        [Authorize(Roles = "Admin, User, Viewer")]
+        [HttpPost("list/alerts")]
+        public async Task<AppResponse<List<AlarmDto>>> GetAlertList(AlarmReqDto dto)
+        {
+            return await _sensorService.GetAlertListAsync(dto);
         }
     }
 }

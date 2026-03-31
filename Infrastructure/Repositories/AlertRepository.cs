@@ -1,0 +1,41 @@
+﻿using Domain.Entities;
+using Domain.Interfaces;
+using Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+
+namespace Infrastructure.Repositories
+{
+    public class AlertRepository(AppDbContext context) : IAlertRepository
+    {
+        private readonly AppDbContext _context = context;
+
+        public async Task AddAsync(Alerts entity)
+        {
+            await _context.Alerts.AddAsync(entity);
+        }
+
+        public async Task<List<Alerts>> GetAlertListAsync(string? vehicleId, DateOnly date, bool showInactive)
+        {
+            var start = new DateTime(
+                date.Year,
+                date.Month,
+                date.Day,
+                0, 0, 0,
+                DateTimeKind.Utc
+            );
+            var end = start.AddDays(1);
+
+            IQueryable<Alerts> query = _context.Alerts
+                .AsNoTracking()
+                .Where(w => w.CreatedAt >= start && w.CreatedAt < end);
+
+            if (!string.IsNullOrWhiteSpace(vehicleId))
+                query = query.Where(w => w.VehicleId == vehicleId);
+
+            if (!showInactive)
+                query = query.Where(w => w.Active);
+
+            return await query.ToListAsync();
+        }
+    }
+}
