@@ -6,6 +6,6 @@ namespace Application.Interfaces
     public interface IAlertHub
     {
         Task SendLocationUpdate(List<SensorData> dto);
-        Task SendLowFuelAlert(string vehicleId, double remainingHours);
+        Task SendLowFuelAlert(string vehicleId, double remainingHours, string messageAlarm);
     }
 }

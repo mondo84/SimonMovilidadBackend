@@ -14,12 +14,13 @@ namespace IotApp.RealTime
             await _hub.Clients.All.SendAsync("LOCATION_UPDATE", historyList);
         }
 
-        public async Task SendLowFuelAlert(string vehicleId, double remainingHours)
+        public async Task SendLowFuelAlert(string vehicleId, double remainingHours, string messageAlarm)
         {
             await _hub.Clients.All.SendAsync("LOW_FUEL_ALERT", new
             {
                 vehicleId,
-                remainingHours
+                remainingHours,
+                Message = messageAlarm
             });
         }
     }

@@ -37,5 +37,13 @@ namespace Infrastructure.Repositories
 
             return await query.ToListAsync();
         }
+
+        public async Task<Alerts?> GetLastAlertByVehicle(string vehicleId)
+        {
+            return await _context.Alerts
+            .Where(a => a.VehicleId == vehicleId)
+            .OrderByDescending(a => a.CreatedAt)
+            .FirstOrDefaultAsync();
+        }
     }
 }

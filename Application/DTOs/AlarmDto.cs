@@ -14,6 +14,14 @@ namespace Application.DTOs
         public string Message { get; set; } = string.Empty;
 
         [Required]
+        [JsonPropertyName("Lat")]
+        public double Lat { get; set; }
+
+        [Required]
+        [JsonPropertyName("Long")]
+        public double Long { get; set; }
+
+        [Required]
         [JsonPropertyName("Active")]
         public bool Active { get; set; } = true;
 

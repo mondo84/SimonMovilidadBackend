@@ -54,10 +54,28 @@ namespace Application.Services
             
             if (remainingHours < 1)
             {
-                // Alerta combustible bajo. SignalR.
-                await _notifier.SendLowFuelAlert(dto.VehicleId, remainingHours);
+                var lastAlert = await _unitOfWork.Alerts
+                    .GetLastAlertByVehicle(dto.VehicleId);
+
+                if(lastAlert == null || lastAlert.CreatedAt < DateTime.UtcNow.AddMinutes(-20))
+                {
+                    var messageAlarm = "Alerta de combustible bajo";
+                    var alarmDto = new AlarmDto()
+                    {
+                        VehicleId = dto.VehicleId,
+                        Message = messageAlarm,
+                        Lat = dto.Lat,
+                        Long = dto.Long,
+                        Active = dto.Active,
+                        CreatedAt = DateTime.UtcNow,
+                    };
+
+                    // Alerta combustible bajo. SignalR.
+                    await _notifier.SendLowFuelAlert(dto.VehicleId, remainingHours, messageAlarm);
+                    await CreateAlarmAsync(alarmDto);
+                }
             }
-            var NumberOfRecentRecords = 50;
+            var NumberOfRecentRecords = 20;
             var sensorHistory = await _unitOfWork.Sensors.TodaysSensorDataHistory(NumberOfRecentRecords);
             await _notifier.SendLocationUpdate(sensorHistory); // Enviar localizacion tiempo real. SignalR.
 
@@ -78,6 +96,8 @@ namespace Application.Services
             {
                 VehicleId=dto.VehicleId,
                 Message = dto.Message,
+                Lat = dto.Lat,
+                Long = dto.Long,
                 Active = dto.Active,
                 CreatedAt = DateTime.Now,
             }; 
@@ -100,6 +120,8 @@ namespace Application.Services
                 {
                     VehicleId = s.VehicleId,
                     Message = s.Message,
+                    Lat = s.Lat,
+                    Long = s.Long,
                     Active = s.Active,
                     CreatedAt = s.CreatedAt
                 })
