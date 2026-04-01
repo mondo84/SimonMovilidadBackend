@@ -1,10 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Domain.Entities;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Application.DTOs
 {
-    public class AlarmDto
+    public class AlarmDto : EntityBase
     {
+        [JsonPropertyName("Id")]
+        public int Id { get; set; }
+
         [Required]
         [JsonPropertyName("Vehicle_id")]
         public string VehicleId { get; set; } = string.Empty;
@@ -24,8 +28,5 @@ namespace Application.DTOs
         [Required]
         [JsonPropertyName("Active")]
         public bool Active { get; set; } = true;
-
-        [JsonPropertyName("CreatedAt")]
-        public virtual DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

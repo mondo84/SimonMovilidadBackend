@@ -5,6 +5,7 @@ using Application.Response;
 using Domain.Entities;
 using Domain.Interfaces;
 using System.Net;
+using System.Security.Claims;
 
 namespace Application.Services
 {
@@ -22,6 +23,7 @@ namespace Application.Services
 
             var result = resp.Select(x => new SensorDataDto
             {
+                Id = x.Id,
                 VehicleId = hasRole ? x.VehicleId : MaskVehicleId(x.VehicleId),
                 Lat = x.Lat,
                 Long = x.Long,
@@ -66,9 +68,10 @@ namespace Application.Services
                         CreatedAt = DateTime.UtcNow,
                     };
 
-                    // Alerta combustible bajo. SignalR.
-                    await _notifier.SendLowFuelAlert(dto.VehicleId, remainingHours, messageAlarm);
                     await CreateAlarmAsync(alarmDto);
+
+                    // Alerta combustible bajo. SignalR.
+                    await _notifier.SendLowFuelAlert(alarmDto);
                 }
             }
             var NumberOfRecentRecords = 20;
@@ -96,12 +99,23 @@ namespace Application.Services
                 Long = dto.Long,
                 Active = dto.Active,
                 CreatedAt = DateTime.Now,
-            }; 
+            };
 
             await _unitOfWork.Alerts.AddAsync(Alarm);
             await _unitOfWork.SaveChangesAsync();
 
-            return AppResponse<AlarmDto>.Ok(dto, "Alarma creada exitosamente");
+            var result = new AlarmDto
+            {
+                Id = Alarm.Id,
+                VehicleId = Alarm.VehicleId,
+                Message = Alarm.Message,
+                Lat = Alarm.Lat,
+                Long = Alarm.Long,
+                Active = Alarm.Active,
+                CreatedAt = Alarm.CreatedAt,
+            };
+
+            return AppResponse<AlarmDto>.Ok(result, "Alarma creada exitosamente");
         }
 
         public async Task<AppResponse<List<AlarmDto>>> GetAlertListAsync(AlarmReqDto dto)
@@ -114,6 +128,7 @@ namespace Application.Services
             var responseDto = respEntity
                 .Select(s => new AlarmDto
                 {
+                    Id= s.Id,
                     VehicleId = s.VehicleId,
                     Message = s.Message,
                     Lat = s.Lat,

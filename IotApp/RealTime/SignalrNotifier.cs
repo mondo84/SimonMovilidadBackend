@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.DTOs;
+using Application.Interfaces;
 using Domain.Entities;
 using IotApp.Hubs;
 using Microsoft.AspNetCore.SignalR;
@@ -14,14 +15,9 @@ namespace IotApp.RealTime
             await _hub.Clients.All.SendAsync("LOCATION_UPDATE", historyList);
         }
 
-        public async Task SendLowFuelAlert(string vehicleId, double remainingHours, string messageAlarm)
+        public async Task SendLowFuelAlert(AlarmDto dto)
         {
-            await _hub.Clients.All.SendAsync("LOW_FUEL_ALERT", new
-            {
-                vehicleId,
-                remainingHours,
-                Message = messageAlarm
-            });
+            await _hub.Clients.All.SendAsync("LOW_FUEL_ALERT", dto);
         }
     }
 }

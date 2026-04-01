@@ -1,10 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Domain.Entities;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace Application.DTOs
 {
-    public class SensorDataDto
+    public class SensorDataDto : EntityBase
     {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
         [Required]
         [JsonPropertyName("Vehicle_id")]
         public string VehicleId { get; set; } = string.Empty;
