@@ -5,7 +5,6 @@ using Application.Response;
 using Domain.Entities;
 using Domain.Interfaces;
 using System.Net;
-using System.Security.Claims;
 
 namespace Application.Services
 {
