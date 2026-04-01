@@ -24,11 +24,19 @@ namespace Application.DTOs
         public double FuelLvl { get; set; }
 
         [Required]
+        [JsonPropertyName("speed")]
+        public float Speed { get; set; }
+
+        [Required]
         [JsonPropertyName("temperature")]
         public double Temp { get; set; }
 
         [Required]
         [JsonPropertyName("timestamp")]
         public DateTime Timestamp { get; set; }
+
+        [Required]
+        [JsonPropertyName("active")]
+        public bool Active { get; set; } = true;
     }
 }

@@ -6,6 +6,7 @@ namespace Domain.Interfaces
     {
         IUserRepository Users { get; }
         ISensorRepository Sensors { get; }
+        IAlertRepository Alerts { get; }
         Task<int> SaveChangesAsync();
     }
 }

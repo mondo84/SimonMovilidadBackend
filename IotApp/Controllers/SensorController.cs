@@ -1,6 +1,7 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
 using Application.Response;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,9 +15,32 @@ namespace IotApp.Controllers
 
         [Authorize(Roles = "Admin, User, Viewer")]
         [HttpPost("data")]
-        public async Task<AppResponse<SensorDto>> CaptureSensorData(SensorDto request)
+        public async Task<AppResponse<List<SensorData>>> CaptureSensorData(List<SensorDto> dtoList)
         {
-            return await _sensorService.SaveData(request);
+            return await _sensorService.SaveData(dtoList);
+        }
+
+        [Authorize(Roles = "Admin, User, Viewer")]
+        [HttpGet()]
+        public Task<AppResponse<List<SensorDataDto>>> GetSensorDataList([FromQuery] bool showInactive = false)
+        {
+            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+            return _sensorService.GetSensorDataListAsync(showInactive, role);
+        }
+
+        [Authorize(Roles = "Admin, User, Viewer")]
+        [HttpPost("create/alert")]
+        public async Task<AppResponse<AlarmDto>> Create(AlarmDto dto)
+        {
+            return await _sensorService.CreateAlarmAsync(dto);
+        }
+
+        [Authorize(Roles = "Admin, User, Viewer")]
+        [HttpPost("list/alerts")]
+        public async Task<AppResponse<List<AlarmDto>>> GetAlertList(AlarmReqDto dto)
+        {
+            return await _sensorService.GetAlertListAsync(dto);
         }
     }
 }

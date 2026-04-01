@@ -3,4 +3,5 @@
   <Project Path="Domain/Domain.csproj" />
   <Project Path="Infrastructure/Infrastructure.csproj" />
   <Project Path="IotApp/IotApp.csproj" />
+  <Project Path="IotUnitTest/IotUnitTest.csproj" Id="3880b336-423e-4f2e-81ee-1bc20146e145" />
 </Solution>

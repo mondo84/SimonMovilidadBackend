@@ -1,10 +1,12 @@
-﻿using Domain.Entities;
+﻿using Application.DTOs;
+using Domain.Entities;
+using System.Text.Json.Serialization;
 
 namespace Application.Interfaces
 {
     public interface IAlertHub
     {
-        Task SendLocationUpdate(SensorData dto);
-        Task SendLowFuelAlert(string vehicleId, double remainingHours);
+        Task SendLocationUpdate(List<SensorData> dto);
+        Task SendLowFuelAlert(AlarmDto dto);
     }
 }

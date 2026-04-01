@@ -1,23 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Domain.Entities;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Domain.Entities
+namespace Application.DTOs
 {
-    public class Alerts : EntityBase
+    public class AlarmDto : EntityBase
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [JsonPropertyName("Id")]
         public int Id { get; set; }
 
-        [Column("Vehicle_id")]
+        [Required]
         [JsonPropertyName("Vehicle_id")]
         public string VehicleId { get; set; } = string.Empty;
 
         [Required]
-        [MaxLength(100)]
-        [Column("Message")]
         [JsonPropertyName("Message")]
         public string Message { get; set; } = string.Empty;
 
@@ -30,9 +26,7 @@ namespace Domain.Entities
         public double Long { get; set; }
 
         [Required]
-        [Column("Active")]
         [JsonPropertyName("Active")]
         public bool Active { get; set; } = true;
-
     }
 }

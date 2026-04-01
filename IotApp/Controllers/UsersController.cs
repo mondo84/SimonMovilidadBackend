@@ -13,13 +13,13 @@ namespace AppPortal.Controllers
     {
         private readonly IUserService _service = service;
 
-        [Authorize(Roles = "Admin, User")]
+        [Authorize(Roles = "Admin, User, Viewer")]
         [HttpGet()]
         public Task<AppResponse<List<Users>>> GetUserList([FromQuery] bool showInactive = false) {
             return _service.GetUserListAsync(showInactive);
         }
 
-        [Authorize(Roles="Admin, User")]
+        [Authorize(Roles = "Admin, User, Viewer")]
         [HttpGet("{id}")]
         public async Task<AppResponse<Users>> GetUserById(int id)
         {
@@ -33,7 +33,7 @@ namespace AppPortal.Controllers
             return await _service.CreateUserAsync(user);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, User")]
         [HttpPut()]
         public async Task<AppResponse<Users>> Update(UserDto dto)
         {

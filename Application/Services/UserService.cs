@@ -13,7 +13,7 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork = unitOfWork;
         private readonly ITokenService _tokenService = tokenService;
         
-        public async Task<AppResponse> Auth(AuthDto dto)
+        public async Task<AppResponse<UserTokenDto>> Auth(AuthDto dto)
         {
             var user = await _unitOfWork.Users.GetByUsernameAsync(dto.Username);
 
@@ -108,7 +108,7 @@ namespace Application.Services
         private static Users VaryfyUser (AuthDto dto, Users? user)
         {
             if(user == null)
-               throw new AppException(HttpStatusCode.Conflict, "El correo usuario no se encuentra registrado");
+               throw new AppException(HttpStatusCode.Conflict, "El usuario no se encuentra registrado");
 
             if (!user.Active)
                 throw new AppException(HttpStatusCode.Conflict, "Usuario inactivo");
