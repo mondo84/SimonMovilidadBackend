@@ -90,7 +90,7 @@ dotnet tool install --global dotnet-ef
 ### 4.1 Clonar repositorio
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/mondo84/SimonMovilidadBackend.git
 cd IotApp
 ```
 
@@ -223,6 +223,10 @@ Se utiliza **SignalR** para:
 
 ```bash
 dotnet test (corre todas las pruebas)
+
+```
+
+```bash
 dotnet test .\IotUnitTest\IotUnitTest.csproj --filter FullyQualifiedName~IotUnitTest.AlertServiceTest.calcula_prediccion_correcta (Independiente)
 ```
 
