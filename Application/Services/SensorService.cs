@@ -43,7 +43,7 @@ namespace Application.Services
 
             await SaveDataBatch(listDto);
 
-            var dto = listDto.FirstOrDefault()!;
+            var dto = listDto.Last()!;
 
             // Calcular autonomía
             var remainingHours = await _alertService.FuelPrediction(dto);
@@ -75,7 +75,13 @@ namespace Application.Services
             }
             var NumberOfRecentRecords = 20;
             var sensorHistory = await _unitOfWork.Sensors.TodaysSensorDataHistory(NumberOfRecentRecords);
-            await _notifier.SendLocationUpdate(sensorHistory); // Enviar localizacion tiempo real. SignalR.
+
+            if (sensorHistory.Count > 0)
+            {
+                var latestSensor = sensorHistory.Last();
+                await _notifier.SendLocationUpdate(latestSensor);   // Mobile. Map.
+                await _notifier.SendLocationUpdateList(sensorHistory); // Web. History.
+            }
 
             return AppResponse<List<SensorData>>.Ok(sensorHistory, "Datos guardados exitosamente");
         }

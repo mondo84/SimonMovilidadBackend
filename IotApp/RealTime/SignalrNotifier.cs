@@ -10,7 +10,12 @@ namespace IotApp.RealTime
     {
         private readonly IHubContext<AlertsHub> _hub = hub;
 
-        public async Task SendLocationUpdate(List<SensorData> historyList)
+        public async Task SendLocationUpdate(SensorData position)
+        {
+            await _hub.Clients.All.SendAsync("LOCATION_UPDATE_ONE", position);
+        }
+
+        public async Task SendLocationUpdateList(List<SensorData> historyList)
         {
             await _hub.Clients.All.SendAsync("LOCATION_UPDATE", historyList);
         }
