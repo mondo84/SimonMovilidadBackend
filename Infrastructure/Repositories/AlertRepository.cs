@@ -21,13 +21,16 @@ namespace Infrastructure.Repositories
                 date.Month,
                 date.Day,
                 0, 0, 0,
-                DateTimeKind.Utc
+                DateTimeKind.Local
             );
             var end = start.AddDays(1);
 
+            var startUtc = start.ToUniversalTime();
+            var endUtc = end.ToUniversalTime();
+
             IQueryable<Alerts> query = _context.Alerts
                 .AsNoTracking()
-                .Where(w => w.CreatedAt >= start && w.CreatedAt < end);
+                .Where(w => w.CreatedAt >= startUtc && w.CreatedAt < endUtc);
 
             if (!string.IsNullOrWhiteSpace(vehicleId))
                 query = query.Where(w => w.VehicleId == vehicleId);

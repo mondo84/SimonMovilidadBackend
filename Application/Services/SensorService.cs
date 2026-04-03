@@ -14,9 +14,9 @@ namespace Application.Services
         private readonly IAlertService _alertService = alertService;
         private readonly IAlertHub _notifier = notifier;
 
-        public async Task<AppResponse<List<SensorDataDto>>> GetSensorDataListAsync(bool showInactive, string? role)
+        public async Task<AppResponse<List<SensorDataDto>>> GetSensorDataListAsync(DateOnly date, bool showInactive, string? role)
         {
-            var resp = await _unitOfWork.Sensors.GetAllAsync(showInactive);
+            var resp = await _unitOfWork.Sensors.GetAllAsync(date, showInactive);
 
             var hasRole = string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase);
 

@@ -8,7 +8,7 @@ namespace Application.Interfaces
     {
         Task<AppResponse<List<SensorData>>> SaveData(List<SensorDto> listDto);
 
-        Task<AppResponse<List<SensorDataDto>>> GetSensorDataListAsync(bool showInactive, string? role);
+        Task<AppResponse<List<SensorDataDto>>> GetSensorDataListAsync(DateOnly date, bool showInactive, string? role);
 
         Task<AppResponse<AlarmDto>> CreateAlarmAsync(AlarmDto dto);
 
