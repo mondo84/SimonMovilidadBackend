@@ -161,7 +161,7 @@ namespace Application.Services
                     Speed = dto.Speed,
                     Temperature = dto.Temp,
                     VehicleId = dto.VehicleId,
-                    Timestamp = dto.Timestamp.ToUniversalTime(),
+                    Timestamp = dto.Timestamp
                 };
 
                 await _unitOfWork.Sensors.AddAsync(sensorData);

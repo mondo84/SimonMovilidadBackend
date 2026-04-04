@@ -72,15 +72,12 @@ namespace Infrastructure.Repositories
 
         public async Task<List<SensorData>> TodaysSensorDataHistory(int takeNumber)
         {
-            var todayLocal = DateTime.Now.Date;
-            var tomorrowLocal = todayLocal.AddDays(1);
-
-            var startUtc = todayLocal.ToUniversalTime();
-            var endUtc = tomorrowLocal.ToUniversalTime();
+            var todayUtc = DateTime.UtcNow.Date;
+            var tomorrowUtc = todayUtc.AddDays(1);
 
             // Creacion mayor a la media noche de hoy, y menor a la de mañana.
             return await _context.SensorData
-                .Where(w => w.Active && w.Timestamp >= startUtc && w.Timestamp < endUtc)
+                .Where(w => w.Active && w.Timestamp >= todayUtc && w.Timestamp < tomorrowUtc)
                 .OrderByDescending(w => w.Timestamp)
                 .Take(takeNumber)
                 .OrderBy(w => w.Timestamp)  // reordenar para gráfico cronológico
