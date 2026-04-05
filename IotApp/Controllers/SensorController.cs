@@ -22,11 +22,11 @@ namespace IotApp.Controllers
 
         [Authorize(Roles = "Admin, User, Viewer")]
         [HttpGet()]
-        public Task<AppResponse<List<SensorDataDto>>> GetSensorDataList([FromQuery] bool showInactive = false)
+        public Task<AppResponse<List<SensorDataDto>>> GetSensorDataList([FromQuery] DateOnly date, [FromQuery] bool showInactive = false)
         {
             var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
 
-            return _sensorService.GetSensorDataListAsync(showInactive, role);
+            return _sensorService.GetSensorDataListAsync(date, showInactive, role);
         }
 
         [Authorize(Roles = "Admin, User, Viewer")]
@@ -34,6 +34,13 @@ namespace IotApp.Controllers
         public async Task<AppResponse<AlarmDto>> Create(AlarmDto dto)
         {
             return await _sensorService.CreateAlarmAsync(dto);
+        }
+
+        [Authorize(Roles = "Admin, User, Viewer")]
+        [HttpPut("update/alert")]
+        public async Task<AppResponse<Alerts>> Update(AlarDtoUpdate dto)
+        {
+            return await _sensorService.UpdateAlarmAsync(dto);
         }
 
         [Authorize(Roles = "Admin, User, Viewer")]

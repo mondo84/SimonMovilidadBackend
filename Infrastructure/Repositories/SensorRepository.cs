@@ -35,10 +35,23 @@ namespace Infrastructure.Repositories
             return await query.ToListAsync();
         }
 
-        public async Task<List<SensorData>> GetAllAsync(bool showInactive)
+        public async Task<List<SensorData>> GetAllAsync(DateOnly date, bool showInactive)
         {
+            var start = new DateTime(
+                date.Year,
+                date.Month,
+                date.Day,
+                0, 0, 0,
+                DateTimeKind.Local
+            );
+            var end = start.AddDays(1);
+
+            var startUtc = start.ToUniversalTime();
+            var endUtc = end.ToUniversalTime();
+
             var query = _context.SensorData
-                    .Where(w => w.VehicleId != null)
+                    .Where(w => w.VehicleId != null 
+                    && w.Timestamp >= startUtc && w.Timestamp < endUtc)
                     .AsNoTracking();
 
             if (!showInactive)
@@ -59,9 +72,15 @@ namespace Infrastructure.Repositories
 
         public async Task<List<SensorData>> TodaysSensorDataHistory(int takeNumber)
         {
-            // Creacion mayor a la media noche de hoy, y menor a la de mañana.
+            var todayLocal = DateTime.Now.Date;
+            var tomorrowLocal = todayLocal.AddDays(1);
+
+            var todayUtc = todayLocal.ToUniversalTime();
+            var tomorrowUtc = tomorrowLocal.ToUniversalTime();
+
+            // Creacion mayor a la media noche de hoy, y menor a la de mañana. .ToLocalTime()
             return await _context.SensorData
-                .Where(w => w.Active)
+                .Where(w => w.Active && w.Timestamp >= todayUtc && w.Timestamp < tomorrowUtc)
                 .OrderByDescending(w => w.Timestamp)
                 .Take(takeNumber)
                 .OrderBy(w => w.Timestamp)  // reordenar para gráfico cronológico

@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.DTOs;
+using Application.Enums;
 using Application.Interfaces;
 using Application.Response;
 using Domain.Entities;
@@ -14,9 +15,9 @@ namespace Application.Services
         private readonly IAlertService _alertService = alertService;
         private readonly IAlertHub _notifier = notifier;
 
-        public async Task<AppResponse<List<SensorDataDto>>> GetSensorDataListAsync(bool showInactive, string? role)
+        public async Task<AppResponse<List<SensorDataDto>>> GetSensorDataListAsync(DateOnly date, bool showInactive, string? role)
         {
-            var resp = await _unitOfWork.Sensors.GetAllAsync(showInactive);
+            var resp = await _unitOfWork.Sensors.GetAllAsync(date, showInactive);
 
             var hasRole = string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase);
 
@@ -43,7 +44,7 @@ namespace Application.Services
 
             await SaveDataBatch(listDto);
 
-            var dto = listDto.FirstOrDefault()!;
+            var dto = listDto.Last()!;
 
             // Calcular autonomía
             var remainingHours = await _alertService.FuelPrediction(dto);
@@ -75,7 +76,13 @@ namespace Application.Services
             }
             var NumberOfRecentRecords = 20;
             var sensorHistory = await _unitOfWork.Sensors.TodaysSensorDataHistory(NumberOfRecentRecords);
-            await _notifier.SendLocationUpdate(sensorHistory); // Enviar localizacion tiempo real. SignalR.
+
+            if (sensorHistory.Count > 0)
+            {
+                var latestSensor = sensorHistory.Last();
+                await _notifier.SendLocationUpdate(latestSensor);   // Mobile. Map.
+                await _notifier.SendLocationUpdateList(sensorHistory); // Web. History.
+            }
 
             return AppResponse<List<SensorData>>.Ok(sensorHistory, "Datos guardados exitosamente");
         }
@@ -97,6 +104,7 @@ namespace Application.Services
                 Lat = dto.Lat,
                 Long = dto.Long,
                 Active = dto.Active,
+                Status = 1,
                 CreatedAt = DateTime.Now,
             };
 
@@ -111,10 +119,35 @@ namespace Application.Services
                 Lat = Alarm.Lat,
                 Long = Alarm.Long,
                 Active = Alarm.Active,
+                Status = 1,
                 CreatedAt = Alarm.CreatedAt,
             };
 
             return AppResponse<AlarmDto>.Ok(result, "Alarma creada exitosamente");
+        }
+
+        public async Task<AppResponse<Alerts>> UpdateAlarmAsync(AlarDtoUpdate dto)
+        {
+            if (dto?.Id == null)
+                throw new AppException(HttpStatusCode.BadRequest, "Id de la alarma es requerido");
+
+            var respEntity = await _unitOfWork.Alerts.GetAlertByIdAsync(dto.Id) ?? 
+                throw new AppException(HttpStatusCode.NotFound, "Alarma no encontrada");
+
+            if (dto.Note != null)
+                respEntity.Note = dto.Note;
+
+            if (dto.Status is int status )  // Cast from int? to int 
+            {
+                if (!Enum.IsDefined(typeof(AlarmStatus), status))
+                    throw new AppException(HttpStatusCode.BadRequest, "Estado inválido");
+
+                respEntity.Status = status;
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return AppResponse<Alerts>.Ok(respEntity, "Alarma actualizada exitosamente");
         }
 
         public async Task<AppResponse<List<AlarmDto>>> GetAlertListAsync(AlarmReqDto dto)
@@ -133,7 +166,9 @@ namespace Application.Services
                     Lat = s.Lat,
                     Long = s.Long,
                     Active = s.Active,
-                    CreatedAt = s.CreatedAt
+                    CreatedAt = s.CreatedAt,
+                    Status = s.Status,
+                    Note = s.Note ?? ""
                 })
                 .ToList();
 
@@ -155,7 +190,7 @@ namespace Application.Services
                     Speed = dto.Speed,
                     Temperature = dto.Temp,
                     VehicleId = dto.VehicleId,
-                    Timestamp = dto.Timestamp.ToUniversalTime(),
+                    Timestamp = dto.Timestamp.ToUniversalTime()
                 };
 
                 await _unitOfWork.Sensors.AddAsync(sensorData);
