@@ -30,6 +30,12 @@ namespace Infrastructure.Data
                 .OnDelete(DeleteBehavior.Restrict); // restriccion para evitar borrar un rol con users asociado.
             });
 
+            // Valor por defecto en la migracion.
+            modelBuilder.Entity<Alerts>(alert => {
+                alert.Property(x => x.Status)
+                .HasDefaultValueSql("1");
+            });
+
             // Recorre todas las entidades que estan en caché.
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {

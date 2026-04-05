@@ -21,6 +21,11 @@ namespace Domain.Entities
         [JsonPropertyName("Message")]
         public string Message { get; set; } = string.Empty;
 
+        [MaxLength(200)]
+        [Column("Note")]
+        [JsonPropertyName("Note")]
+        public string? Note { get; set; }
+
         [Required]
         [JsonPropertyName("Lat")]
         public double Lat { get; set; }
@@ -28,6 +33,10 @@ namespace Domain.Entities
         [Required]
         [JsonPropertyName("Long")]
         public double Long { get; set; }
+
+        [Required]
+        [JsonPropertyName("Status")]
+        public int Status { get; set; } = 1;
 
         [Required]
         [Column("Active")]

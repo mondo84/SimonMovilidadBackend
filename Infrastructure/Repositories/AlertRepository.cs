@@ -14,6 +14,11 @@ namespace Infrastructure.Repositories
             await _context.Alerts.AddAsync(entity);
         }
 
+        public async Task<Alerts?> GetAlertByIdAsync(int alarmId)
+        {
+            return await _context.Alerts.FirstOrDefaultAsync(row => row.Id == alarmId);
+        }
+
         public async Task<List<Alerts>> GetAlertListAsync(string? vehicleId, DateOnly date, bool showInactive)
         {
             var start = new DateTime(

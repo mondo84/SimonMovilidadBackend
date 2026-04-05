@@ -37,6 +37,13 @@ namespace IotApp.Controllers
         }
 
         [Authorize(Roles = "Admin, User, Viewer")]
+        [HttpPut("update/alert")]
+        public async Task<AppResponse<Alerts>> Update(AlarDtoUpdate dto)
+        {
+            return await _sensorService.UpdateAlarmAsync(dto);
+        }
+
+        [Authorize(Roles = "Admin, User, Viewer")]
         [HttpPost("list/alerts")]
         public async Task<AppResponse<List<AlarmDto>>> GetAlertList(AlarmReqDto dto)
         {

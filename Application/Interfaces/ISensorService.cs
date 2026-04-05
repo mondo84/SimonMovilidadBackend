@@ -12,6 +12,8 @@ namespace Application.Interfaces
 
         Task<AppResponse<AlarmDto>> CreateAlarmAsync(AlarmDto dto);
 
+        Task<AppResponse<Alerts>> UpdateAlarmAsync(AlarDtoUpdate dto);
+
         Task<AppResponse<List<AlarmDto>>> GetAlertListAsync(AlarmReqDto dto);
     }
 }

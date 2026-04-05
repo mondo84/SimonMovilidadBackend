@@ -6,6 +6,7 @@ namespace Domain.Interfaces
     {
         Task AddAsync(Alerts user);
         Task<List<Alerts>> GetAlertListAsync(string? vehicleId, DateOnly date, bool showInactive);
+        Task<Alerts?> GetAlertByIdAsync(int alarmId);
         Task<Alerts?> GetLastAlertByVehicle(string vehicleId);
     }
 }

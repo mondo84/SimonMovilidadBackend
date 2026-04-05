@@ -1,5 +1,6 @@
 ﻿using Application.Common.Exceptions;
 using Application.DTOs;
+using Application.Enums;
 using Application.Interfaces;
 using Application.Response;
 using Domain.Entities;
@@ -103,6 +104,7 @@ namespace Application.Services
                 Lat = dto.Lat,
                 Long = dto.Long,
                 Active = dto.Active,
+                Status = 1,
                 CreatedAt = DateTime.Now,
             };
 
@@ -117,10 +119,35 @@ namespace Application.Services
                 Lat = Alarm.Lat,
                 Long = Alarm.Long,
                 Active = Alarm.Active,
+                Status = 1,
                 CreatedAt = Alarm.CreatedAt,
             };
 
             return AppResponse<AlarmDto>.Ok(result, "Alarma creada exitosamente");
+        }
+
+        public async Task<AppResponse<Alerts>> UpdateAlarmAsync(AlarDtoUpdate dto)
+        {
+            if (dto?.Id == null)
+                throw new AppException(HttpStatusCode.BadRequest, "Id de la alarma es requerido");
+
+            var respEntity = await _unitOfWork.Alerts.GetAlertByIdAsync(dto.Id) ?? 
+                throw new AppException(HttpStatusCode.NotFound, "Alarma no encontrada");
+
+            if (dto.Note != null)
+                respEntity.Note = dto.Note;
+
+            if (dto.Status is int status )  // Cast from int? to int 
+            {
+                if (!Enum.IsDefined(typeof(AlarmStatus), status))
+                    throw new AppException(HttpStatusCode.BadRequest, "Estado inválido");
+
+                respEntity.Status = status;
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return AppResponse<Alerts>.Ok(respEntity, "Alarma actualizada exitosamente");
         }
 
         public async Task<AppResponse<List<AlarmDto>>> GetAlertListAsync(AlarmReqDto dto)
@@ -139,7 +166,9 @@ namespace Application.Services
                     Lat = s.Lat,
                     Long = s.Long,
                     Active = s.Active,
-                    CreatedAt = s.CreatedAt
+                    CreatedAt = s.CreatedAt,
+                    Status = s.Status,
+                    Note = s.Note ?? ""
                 })
                 .ToList();
 
