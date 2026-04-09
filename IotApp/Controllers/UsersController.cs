@@ -26,7 +26,7 @@ namespace AppPortal.Controllers
             return await _service.GetUserByIdAsync(id);
         }
 
-        [Authorize(Roles = "Admin, User")]
+        [AllowAnonymous]
         [HttpPost()]
         public async Task<AppResponse<Users>> Create(UserDto user)
         {
