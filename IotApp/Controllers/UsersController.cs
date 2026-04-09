@@ -37,7 +37,7 @@ namespace AppPortal.Controllers
         [HttpPut()]
         public async Task<AppResponse<Users>> Update(UserDto dto)
         {
-            return await _service.UpdateUserAsync(dto); ;
+            return await _service.UpdateUserAsync(dto);
         }
 
         [Authorize(Roles = "Admin")]
