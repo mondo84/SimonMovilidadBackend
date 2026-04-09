@@ -92,6 +92,7 @@ namespace Application.Services
             user.FirstName = dto.FirstName;
             user.LastName = dto.LastName;
             user.UserName = dto.UserName;
+            user.RoleId = dto.RoleId;
             if (dto.Active.HasValue)
                 user.Active = dto.Active.Value;
 
